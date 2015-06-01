@@ -74,6 +74,7 @@ class Assembler
       else
         instruction = c_command line
       end
+      instruction.concat "\n"
       instructions.push instruction
     end
   end
@@ -107,6 +108,13 @@ class Assembler
 end
 
 if $0 == __FILE__
+  /\/(?<filename>\w+)./ =~ ARGV.first
   lines = ARGF.each_line
   assembler = Assembler.new lines
+  assembler.parse
+  file = open("#{filename}.hack", "w")
+  assembler.instructions.each do |line|
+    file.write line
+  end
+  file.close
 end
