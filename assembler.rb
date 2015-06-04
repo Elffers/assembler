@@ -1,3 +1,4 @@
+require 'pry'
 class Assembler
   attr_accessor :input, :instructions
 
@@ -92,18 +93,51 @@ class Assembler
   end
 
   def c_command line
-    head = "111"
     instr, jump = line.split ";"
     jump_bits = ""
+
     if jump
       jump_bits = JUMP_CODE[jump]
     else
       jump_bits = "000"
     end
-    dest, comp = instr.split "="
-    dest_bits = DEST_CODE[dest]
-    comp_bits = COMP_CODE[comp]
-    head + comp_bits + dest_bits + jump_bits
+
+    instr_bits = parse_command instr
+
+    # p head, comp_bits, dest_bits, jump_bits
+    head = "111"
+    head + instr_bits + jump_bits
+  end
+
+  private
+
+  def parse_command instr
+    if instr == "0"
+      return "0101010000"
+    end
+
+    instr_bits = ""
+    if /=/ =~ instr
+      dest, comp = instr.split "="
+      comp_bits = ""
+      if comp
+        comp = sanitize_instr(comp)
+        comp_bits = COMP_CODE[comp]
+      else
+        comp_bits = "0000000"
+      end
+      dest_bits = DEST_CODE[dest]
+      instr_bits = comp_bits + dest_bits
+    else
+      dest_bits = "000"
+      instr_bits = COMP_CODE[instr] + dest_bits
+    end
+    instr_bits
+  end
+
+  def sanitize_instr(comp)
+    # Gets ride of comments following an instruction
+    comp.split(" ").first
   end
 end
 

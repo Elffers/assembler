@@ -5,7 +5,7 @@ describe Assembler do
     let(:input) { <<input.lines
 // Computes R0 = 2 + 3
 
-@2
+@2  //comment
 D=A
 @3
 D=D+A
@@ -30,19 +30,26 @@ input
 
     describe "#c_command" do
       it "returns binary instruction" do
-        line = "D=M"
+        line = "D=M //comment"
         expect(assembler.c_command line).to eq "1111110000010000"
         line = "M=D+M"
         expect(assembler.c_command line).to eq "1111000010001000"
       end
+
+      it "sets instruction bits when no destination specified" do
+        line = "0;JMP"
+        expect(assembler.c_command line).to eq "111 0101010 000 111"
+        line = "D;JGT"
+        expect(assembler.c_command line).to eq "111 0001100 000 001"
+       end
     end
 
     describe "#parse" do
       it "parses instructions into binary" do
         assembler.parse
-        puts assembler.instructions
-        expect(assembler.instructions).to eq ["0000000000000010", "1110110000010000", "0000000000000011", "1110000010010000", "0000000000000000", "1110001100001000"]
+        expect(assembler.instructions).to eq ["0000000000000010\n", "1110110000010000\n", "0000000000000011\n", "1110000010010000\n", "0000000000000000\n", "1110001100001000\n"]
       end
     end
   end
+
 end
