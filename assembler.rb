@@ -1,6 +1,8 @@
 require 'pry'
+require_relative 'symbol_table'
+
 class Assembler
-  attr_accessor :input, :instructions
+  attr_accessor :input, :instructions, :symbols
 
   JUMP_CODE = {
     "JGT" => "001",
@@ -55,16 +57,9 @@ class Assembler
   }
 
   def initialize input
-    @input = sanitize input
+    @input = resolve_symbols input
     @instructions = []
-  end
-
-  def sanitize input
-    # gets rid of whitespace and comments
-    blank = /^\s+$/
-    comment = /\/\/\s/
-    lines = input.reject { |line| line.match(blank) || line.match(comment) }
-    lines.map { |line| line.strip }
+    @symbols = SymbolTable.new
   end
 
   def parse
@@ -86,6 +81,7 @@ class Assembler
     if /\d+/ =~ address
       register = address.to_i
     else
+      register = @symbols[symbol]
       # address is a symbol; look it up in symbol table
     end
     binary = register.to_s(2)
@@ -135,10 +131,24 @@ class Assembler
     instr_bits
   end
 
+  def resolve_symbols input
+    lines = sanitize input
+
+  end
+
+  def sanitize input
+    # gets rid of whitespace and comments (not including inline comments)
+    blank = /^\s+$/
+    comment = /^\/\/.+$/
+    lines = input.reject { |line| line.match(blank) || line.match(comment) }
+    lines.map { |line| line.strip }
+  end
+
   def sanitize_instr(comp)
     # Gets ride of comments following an instruction
     comp.split(" ").first
   end
+
 end
 
 if $0 == __FILE__
