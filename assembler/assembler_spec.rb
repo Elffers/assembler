@@ -22,14 +22,6 @@ input
       end
     end
 
-    describe "#parse" do
-      it "returns array of AInstructions and CInstructions" do
-        assembler.parse
-        expect(assembler.instructions.first).to be_an_instance_of AInstruction
-        expect(assembler.instructions[1]).to be_an_instance_of CInstruction
-      end
-    end
-
     describe "#perform" do
       it "generates binary instructions" do
         assembler.perform
@@ -84,14 +76,8 @@ output
    }
 
    let(:assembler) { Assembler.new input }
-   describe "index input" do
-     it "returns line numbers" do
-       expect(assembler.index(assembler.input)).to eq [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 11, 12, 12, 13, 14, 14, 15]
-     end
-   end
 
-
-   describe "initialize" do
+   describe "#initialize" do
      it "strips comments and whitespace from input" do
 
 # ["@R0", "D=M", "@R1", "D=D-M", "@OUTPUT_FIRST", "D;JGT", "@R1", "D=M", "@OUTPUT_D", "0;JMP", "(OUTPUT_FIRST)", "@R0", "D=M", "(OUTPUT_D)", "@R2", "M=D", "(INFINITE_LOOP)", "@INFINITE_LOOP", "0;JMP"]
@@ -106,11 +92,18 @@ output
      end
    end
 
-   describe "parse" do
-     it "parses instructions into binary" do
+   describe "#perform" do
+     it "generates binary instructions" do
        assembler.perform
        expect(assembler.output).to eq ["0000000000000000\n", "1111110000010000\n", "0000000000000001\n", "1111010011010000\n", "0000000000001010\n", "1110001100000001\n", "0000000000000001\n", "1111110000010000\n", "0000000000001100\n", "1110101010000111\n", "0000000000000000\n", "1111110000010000\n", "0000000000000010\n", "1110001100001000\n", "0000000000001110\n", "1110101010000111\n"]
      end
    end
+
+   describe "#index" do
+     it "returns line numbers" do
+       expect(assembler.send(:index, assembler.input)).to eq [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 11, 12, 12, 13, 14, 14, 15]
+     end
+   end
+
  end
 end

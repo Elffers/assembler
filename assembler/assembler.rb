@@ -1,4 +1,3 @@
-require 'pry'
 require_relative 'symbol_table'
 require_relative 'code'
 
@@ -11,6 +10,33 @@ class Assembler
     @resolved_instrs = resolve_symbols
     @instructions = []
     @output= []
+  end
+
+  def perform
+    parse
+    @instructions.each do |instr|
+      instruction = Code.encode instr
+      @output << instruction.concat("\n")
+    end
+    @output
+  end
+
+  private
+
+  # Creates line numbers of instructions, ignoring instruction labels (i.e.
+  # (OUTPUT), etc)
+  def index input
+    line_numbers = []
+    i = 0
+    @input.each do |instr|
+      if /\(.+\)/ =~ instr
+        line_numbers << i
+      else
+        line_numbers << i
+        i += 1
+      end
+    end
+    line_numbers
   end
 
   def parse
@@ -26,54 +52,33 @@ class Assembler
     end
   end
 
-  def perform
-    parse
-    @instructions.each do |instr|
-      instruction = Code.encode instr
-      @output << instruction.concat("\n")
-    end
-    @output
-  end
-
   def resolve_symbols
     instructions = []
     line_numbers = index @input
+    # Sets addresses for labeled instructions
     @input.each_with_index do |instr, i|
       if /\((?<label>.+)\)/ =~ instr
         @symbols.table[label] = line_numbers[i]
       end
     end
 
+    # Resolves addresses for A-instructions with labels/variables
     @input.each do |instr|
       if /@/ =~ instr
         address = instr.delete "@"
         if /\D+/ =~ address
           resolved_address = @symbols.table[address] || @symbols.insert(address)
           instr = "@" + resolved_address.to_s
-          # address is a symbol; look it up or add to symbol table
         end
       end
       instructions << instr
     end
+    # Deletes label instructions
     instructions.reject { |instr| /\(.+\)/ =~ instr }
   end
 
-  def index input
-    line_numbers = []
-    i = 0
-    @input.each do |instr|
-      if /\(.+\)/ =~ instr
-        line_numbers << i
-      else
-        line_numbers << i
-        i += 1
-      end
-    end
-    line_numbers
-  end
-
+  # Gets rid of whitespace and comments (not including inline comments)
   def sanitize input
-    # gets rid of whitespace and comments (not including inline comments)
     blank = /^\s+$/
     comment = /^\/\/.+$/
     lines = input.reject { |line| line.match(blank) || line.match(comment) }
@@ -82,9 +87,8 @@ class Assembler
     end
   end
 
-  # TODO incorporate into sanitize input
+  # Gets rid of inline comments
   def strip_comments(line)
-    # Gets ride of comments following an instruction
     line.split(" ").first
   end
 end
