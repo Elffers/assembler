@@ -7,10 +7,10 @@ class Assembler
 
   def initialize input
     @input = sanitize input
+    @symbols = SymbolTable.new
     @resolved_instrs = resolve_symbols
     @instructions = []
     @output= []
-    @symbols = SymbolTable.new
   end
 
   def parse
@@ -35,10 +35,41 @@ class Assembler
     @output
   end
 
-  private
-
   def resolve_symbols
-    @resolved_attrs = @input
+    instructions = []
+    line_numbers = index @input
+    @input.each_with_index do |instr, i|
+      if /\((?<label>.+)\)/ =~ instr
+        @symbols.table[label] = line_numbers[i]
+      end
+    end
+
+    @input.each do |instr|
+      if /@/ =~ instr
+        address = instr.delete "@"
+        if /\D+/ =~ address
+          resolved_address = @symbols.table[address] || @symbols.insert(address)
+          instr = "@" + resolved_address.to_s
+          # address is a symbol; look it up or add to symbol table
+        end
+      end
+      instructions << instr
+    end
+    instructions.reject { |instr| /\(.+\)/ =~ instr }
+  end
+
+  def index input
+    line_numbers = []
+    i = 0
+    @input.each do |instr|
+      if /\(.+\)/ =~ instr
+        line_numbers << i
+      else
+        line_numbers << i
+        i += 1
+      end
+    end
+    line_numbers
   end
 
   def sanitize input
@@ -62,7 +93,7 @@ if $0 == __FILE__
   /\/(?<filename>\w+)./ =~ ARGV.first
   lines = ARGF.each_line
   assembler = Assembler.new lines
-  assembler.parse
+  assembler.perform
   file = open("#{filename}.hack", "w")
   assembler.output.each do |line|
     file.write line

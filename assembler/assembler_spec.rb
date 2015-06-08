@@ -84,6 +84,12 @@ output
    }
 
    let(:assembler) { Assembler.new input }
+   describe "index input" do
+     it "returns line numbers" do
+       expect(assembler.index(assembler.input)).to eq [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 11, 12, 12, 13, 14, 14, 15]
+     end
+   end
+
 
    describe "initialize" do
      it "strips comments and whitespace from input" do
@@ -94,19 +100,17 @@ output
        expect(assembler.input[1]).to eq "D=M"
      end
 
-     xit "resolves symbols" do
+     it "resolves symbols" do
        expect(assembler.resolved_instrs.first).to eq "@0"
-       # expect(assembler.input).to eq resolved_instructions
+       expect(assembler.resolved_instrs).to eq resolved_instructions.map { |line| line.strip! }
      end
-
    end
 
    describe "parse" do
-     xit "parses instructions into binary" do
-       assembler.parse
-       expect(assembler.instructions).to eq []
+     it "parses instructions into binary" do
+       assembler.perform
+       expect(assembler.output).to eq ["0000000000000000\n", "1111110000010000\n", "0000000000000001\n", "1111010011010000\n", "0000000000001010\n", "1110001100000001\n", "0000000000000001\n", "1111110000010000\n", "0000000000001100\n", "1110101010000111\n", "0000000000000000\n", "1111110000010000\n", "0000000000000010\n", "1110001100001000\n", "0000000000001110\n", "1110101010000111\n"]
      end
    end
-
  end
 end
