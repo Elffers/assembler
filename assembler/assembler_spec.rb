@@ -1,7 +1,7 @@
 require_relative 'assembler'
 
 describe Assembler do
-  context "with no symbols" do
+  context "without symbols" do
     let(:input) { <<input.lines
 // Computes R0 = 2 + 3
 
@@ -16,44 +16,29 @@ input
     let(:assembler) { Assembler.new input }
 
     describe "#initialize" do
-      it "sets instructions from input file" do
-        p assembler.input
+      it "strips comments and whitespace from input" do
         expect(assembler.input.count).to eq 6
+        expect(assembler.input.first).to eq "@2"
       end
-    end
-
-    describe "#a_command" do
-      it "returns binary instruction" do
-        line = "@2"
-        expect(assembler.a_command line).to eq "0000000000000010"
-      end
-    end
-
-    describe "#c_command" do
-      it "returns binary instruction" do
-        line = "D=M //comment"
-        expect(assembler.c_command line).to eq "1111110000010000"
-        line = "M=D+M"
-        expect(assembler.c_command line).to eq "1111000010001000"
-      end
-
-      it "sets instruction bits when no destination specified" do
-        line = "0;JMP"
-        expect(assembler.c_command line).to eq "1110101010000111"
-        line = "D;JGT"
-        expect(assembler.c_command line).to eq "1110001100000001"
-       end
     end
 
     describe "#parse" do
-      it "parses instructions into binary" do
+      it "returns array of AInstructions and CInstructions" do
         assembler.parse
-        expect(assembler.instructions).to eq ["0000000000000010\n", "1110110000010000\n", "0000000000000011\n", "1110000010010000\n", "0000000000000000\n", "1110001100001000\n"]
+        expect(assembler.instructions.first).to be_an_instance_of AInstruction
+        expect(assembler.instructions[1]).to be_an_instance_of CInstruction
+      end
+    end
+
+    describe "#perform" do
+      it "generates binary instructions" do
+        assembler.perform
+        expect(assembler.output).to eq ["0000000000000010\n", "1110110000010000\n", "0000000000000011\n", "1110000010010000\n", "0000000000000000\n", "1110001100001000\n"]
       end
     end
   end
 
- describe "with symbols" do
+ context "with symbols" do
    let(:input) { <<input.lines
 // Computes R2 = max(R0, R1)  (R0,R1,R2 refer to  RAM[0],RAM[1],RAM[2])
 
@@ -101,8 +86,17 @@ output
    let(:assembler) { Assembler.new input }
 
    describe "initialize" do
-     it "resolves symbols" do
-       expect(assembler.input).to eq resolved_instructions
+     it "strips comments and whitespace from input" do
+
+# ["@R0", "D=M", "@R1", "D=D-M", "@OUTPUT_FIRST", "D;JGT", "@R1", "D=M", "@OUTPUT_D", "0;JMP", "(OUTPUT_FIRST)", "@R0", "D=M", "(OUTPUT_D)", "@R2", "M=D", "(INFINITE_LOOP)", "@INFINITE_LOOP", "0;JMP"]
+       expect(assembler.input.count).to eq 19
+       expect(assembler.input.first).to eq "@R0"
+       expect(assembler.input[1]).to eq "D=M"
+     end
+
+     xit "resolves symbols" do
+       expect(assembler.resolved_instrs.first).to eq "@0"
+       # expect(assembler.input).to eq resolved_instructions
      end
 
    end
