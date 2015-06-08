@@ -57,11 +57,16 @@ class Code
     "D|M" => "1010101"
   }
 
-  def self.encode instruction
-    if instruction.class == AInstruction
-      binary = instruction.address.to_s(2)
-      sprintf("%016d", binary)
-    elsif instruction.class == CInstruction
+  def self.encode instr
+    if instr.class == AInstruction
+      binary = instr.address.to_s(2)
+      return sprintf("%016d", binary)
+    elsif instr.class == CInstruction
+      head = "111"
+      jump = instr.jump.nil? ? "000" : JUMP_CODE[instr.jump]
+      dest = instr.dest.nil? ? "000" : DEST_CODE[instr.dest]
+      comp = COMP_CODE[instr.comp]
+      return head + comp + dest + jump
     else
       raise CodeError
     end
