@@ -72,17 +72,18 @@ module Assembler
 
     # Gets rid of whitespace and comments (not including inline comments)
     def sanitize input
-      blank = /^\s+$/
-      comment = /^\/\/.+$/
-      lines = input.reject { |line| line.match(blank) || line.match(comment) }
-      lines.map { |line| line.strip }.map do |line|
-        strip_comments line
+      sanitized = []
+      blank_or_comment = /^(\s+$|\/\/.+)$/
+      input.each do |line|
+        next if line.match(blank_or_comment)
+        sanitized << strip_comments(line)
       end
+      sanitized
     end
 
     # Gets rid of inline comments
     def strip_comments(line)
-      line.split(" ").first
+      line.strip.split(" ").first
     end
   end
 
