@@ -2,8 +2,7 @@ module Assembler
   class SymbolTable
     attr_accessor :table, :free
 
-    def initialize
-      @table = {
+    TABLE = {
         "R0" => 0,
         "R1" => 1,
         "R2" => 2,
@@ -28,6 +27,9 @@ module Assembler
         "THIS" => 3,
         "THAT" => 4
       }
+
+    def initialize
+      @table = TABLE
       @free = 16
     end
 
