@@ -44,8 +44,8 @@ module Assembler
     end
 
     def resolve_symbols
-      instructions = []
       line_numbers = index @input
+
       # Sets addresses for labeled instructions
       @input.each_with_index do |instr, i|
         if /\((?<label>.+)\)/ =~ instr
@@ -54,7 +54,7 @@ module Assembler
       end
 
       # Resolves addresses for A-instructions with labels/variables
-      @input.each do |instr|
+      instructions = @input.map do |instr|
         if /@/ =~ instr
           address = instr.delete "@"
           if /\D+/ =~ address
@@ -62,8 +62,9 @@ module Assembler
             instr = "@" + resolved_address.to_s
           end
         end
-        instructions << instr
+        instr
       end
+
       # Deletes label instructions
       instructions.reject { |instr| /\(.+\)/ =~ instr }
     end
