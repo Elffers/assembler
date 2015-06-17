@@ -7,16 +7,13 @@ module Assembler
       @symbols = SymbolTable.new
       @resolved_instrs = resolve_symbols
       @instructions = []
-      @output= []
     end
 
     def perform
       parse
-      @instructions.each do |instr|
-        instruction = Code.encode instr
-        @output << instruction.concat("\n")
-      end
-      @output
+      @instructions.map do |instr|
+        Code.encode instr
+      end.join("\n")
     end
 
     private
@@ -95,11 +92,9 @@ module Assembler
     /\/(?<filename>\w+)./ =~ ARGV.first
     lines = ARGF.each_line
     assembler = Assembler.new lines
-    assembler.perform
+    output = assembler.perform
     file = open("#{filename}.hack", "w")
-    assembler.output.each do |line|
-      file.write line
-    end
+    file.write output
     file.close
   end
 end
