@@ -24,10 +24,9 @@ module Assembler
       line_numbers = []
       i = 0
       @input.each do |instr|
-        if /\(.+\)/ =~ instr
-          line_numbers << i
-        else
-          line_numbers << i
+        line_numbers << i
+        # Only increments index if instruction is not a label
+        unless /\(.+\)/ =~ instr
           i += 1
         end
       end
