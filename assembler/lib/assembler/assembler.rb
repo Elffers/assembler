@@ -34,14 +34,12 @@ module Assembler
     end
 
     def parse
-      @resolved_instrs.each do |line|
-        instruction =
-          if /@/ =~ line
-            AInstruction.new line
-          else
-            CInstruction.new line
-          end
-        @instructions << instruction
+      @instructions = @resolved_instrs.map do |line|
+        if /@/ =~ line
+          AInstruction.new line
+        else
+          CInstruction.new line
+        end
       end
     end
 
