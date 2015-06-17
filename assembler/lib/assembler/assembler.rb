@@ -35,9 +35,8 @@ module Assembler
 
     def parse
       @resolved_instrs.each do |line|
-        a_instr = /@/
         instruction =
-          if a_instr =~ line
+          if /@/ =~ line
             AInstruction.new line
           else
             CInstruction.new line
