@@ -20,7 +20,7 @@ module Assembler
 
     # Creates line numbers of instructions, ignoring instruction labels (i.e.
     # (OUTPUT), etc)
-    def index input
+    def index_input
       line_numbers = []
       i = 0
       @input.each do |instr|
@@ -44,7 +44,7 @@ module Assembler
     end
 
     def resolve_symbols
-      line_numbers = index @input
+      line_numbers = index_input
 
       # Sets addresses for labeled instructions
       @input.each_with_index do |instr, i|

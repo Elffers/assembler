@@ -95,9 +95,9 @@ output
      end
    end
 
-   describe "#index" do
+   describe "#index_input" do
      it "returns line numbers" do
-       expect(assembler.send(:index, assembler.input)).to eq [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 11, 12, 12, 13, 14, 14, 15]
+       expect(assembler.send(:index_input)).to eq [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 11, 12, 12, 13, 14, 14, 15]
      end
    end
 
