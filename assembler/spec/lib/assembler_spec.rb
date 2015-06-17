@@ -1,6 +1,4 @@
-require_relative 'assembler'
-
-describe Assembler do
+describe Assembler::Assembler do
   context "without symbols" do
     let(:input) { <<input.lines
 // Computes R0 = 2 + 3
@@ -13,7 +11,7 @@ D=D+A
 M=D
 input
     }
-    let(:assembler) { Assembler.new input }
+    let(:assembler) { Assembler::Assembler.new input }
 
     describe "#initialize" do
       it "strips comments and whitespace from input" do
@@ -75,7 +73,7 @@ M=D
 output
    }
 
-   let(:assembler) { Assembler.new input }
+   let(:assembler) { Assembler::Assembler.new input }
 
    describe "#initialize" do
      it "strips comments and whitespace from input" do

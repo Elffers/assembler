@@ -1,10 +1,8 @@
-require_relative "c_instruction"
-
-describe CInstruction do
+describe Assembler::CInstruction do
   describe ".initialize" do
-    let(:instr) { CInstruction.new "D=M" }
-    let(:instr2) { CInstruction.new "M=M+1" }
-    let(:instr3) { CInstruction.new "D;JMP" }
+    let(:instr) { Assembler::CInstruction.new "D=M" }
+    let(:instr2) { Assembler::CInstruction.new "M=M+1" }
+    let(:instr3) { Assembler::CInstruction.new "D;JMP" }
 
     it "sets dest, comp and jump" do
       expect(instr.jump).to be_nil

@@ -1,7 +1,5 @@
-require_relative 'symbol_table'
-
-describe SymbolTable do
-  let(:st) { SymbolTable.new }
+describe Assembler::SymbolTable do
+  let(:st) { Assembler::SymbolTable.new }
   context "#insert" do
     it "sets value of new symbol to first available register" do
       st.insert "foo"
